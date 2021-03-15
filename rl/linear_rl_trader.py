@@ -221,12 +221,12 @@ class MultiStockEnv:
     # sell any stocks we want to sell
     # then buy any stocks we want to buy
     if sell_index:
-      # NOTE: to simplify the problem, when we sell, we will sell ALL shares of that stock
+      # to simplify the problem, when we sell, we will sell ALL shares of that stock
       for i in sell_index:
         self.cash_in_hand += self.stock_price[i] * self.stock_owned[i]
         self.stock_owned[i] = 0
     if buy_index:
-      # NOTE: when buying, we will loop through each stock we want to buy,
+      # when buying, we will loop through each stock we want to buy,
       #       and buy one share at a time until we run out of cash
       can_buy = True
       while can_buy:
