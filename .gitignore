@@ -1,3 +1,6 @@
 env/
 env
 .DS_Store
+.env
+
+alpaca-api/hist_data/account.json

@@ -10,7 +10,6 @@ import os
 import pickle
 from sklearn.preprocessing import StandardScaler
 
-
 # Let's use AAPL (Apple), MSI (Motorola), SBUX (Starbucks)
 def get_data():
   # returns a T x 3 list of stock prices
@@ -32,9 +31,6 @@ def get_scaler(env):
   scaler = StandardScaler()
   scaler.fit(states)
   return scaler
-
-
-
 
 def maybe_make_dir(directory):
   if not os.path.exists(directory):
