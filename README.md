@@ -7,12 +7,6 @@ Alpaca Reinforcement Learning Agent
 A tool to automate trading and investing. 
 </p>
 <p align="center">
-  <a>
-    <a href="https://goreportcard.com/badge/github.com/Andre-Williams22/" />
-    <img alt="commits" src="https://goreportcard.com/badge/github.com/Andre-Williams22/msconsole" target="_blank" />
-    <a href="https://github.com/Andre-Williams22/msconsole/commits/master">
-    <img alt="commits" src="https://img.shields.io/github/commit-activity/w/Andre-Williams22/msconsole?color=green" target="_blank" />
-  </a> 
   <a href="#" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
