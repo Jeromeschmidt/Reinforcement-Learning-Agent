@@ -1,5 +1,3 @@
-# Reinforcement-Learning-Agent
-
 <p align="center">
 Alpaca Reinforcement Learning Agent
 <br>
@@ -32,6 +30,15 @@ python3 linear_rl_trader.py -m test
 # to plot the distributions
 python3 plot_rl_rewards.py -m test
 ```
+
+
+## Project Goals 
+1. Build a Reinforcement Learning Algorithm 
+2. Connect Algorithm with Real-time Data 
+3. Setup Algorithm with a brokerage to take real positions in the market
+4. Connect algorithm to a scheduler
+
+
 
 ## 📝 License
 
