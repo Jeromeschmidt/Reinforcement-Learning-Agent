@@ -8,7 +8,6 @@ import argparse
 import re
 import os
 import pickle
-
 from sklearn.preprocessing import StandardScaler
 
 
@@ -19,13 +18,8 @@ def get_data():
   df = pd.read_csv('../data/aapl_msi_sbux.csv')
   return df.values
 
-
-
-
-
 def get_scaler(env):
   # return scikit-learn scaler object to scale the states
-  # Note: you could also populate the replay buffer here
 
   states = []
   for _ in range(env.n_step):
