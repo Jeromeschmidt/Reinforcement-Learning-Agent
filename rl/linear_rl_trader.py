@@ -16,9 +16,6 @@ from sklearn.preprocessing import StandardScaler
 def get_data():
   # returns a T x 3 list of stock prices
   # each row is a different stock
-  # 0 = AAPL
-  # 1 = MSI
-  # 2 = SBUX
   df = pd.read_csv('../tf2.0/aapl_msi_sbux.csv')
   return df.values
 
