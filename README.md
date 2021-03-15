@@ -1,9 +1,5 @@
 # Reinforcement-Learning-Agent
 
-
-
-# Google-Sheets-API
-
 <p align="center">
 Alpaca Reinforcement Learning Agent
 <br>
