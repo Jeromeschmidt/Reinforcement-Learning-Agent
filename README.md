@@ -44,8 +44,8 @@ python3 plot_rl_rewards.py -m test
 
 ## Project Goals 
 1. Build a Reinforcement Learning Algorithm 
-2. Connect Algorithm with Real-time Data 
-3. Setup Algorithm with a brokerage to take real positions in the market
+2. Connect algorithm with real-time data 
+3. Setup algorithm with a brokerage to take real positions in the market
 4. Connect algorithm to a scheduler
 
 
