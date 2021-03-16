@@ -28,7 +28,6 @@ def hist_data(symbol, timeframe="15Min", limit=200, start="", end="", after="", 
         "until": until
     }
 
-
     r = requests.get(bar_url, headers=headers, params=params)
 
     json_dump = r.json()
