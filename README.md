@@ -20,23 +20,23 @@ A tool to automate trading and investing.
 # clone the repo
 git clone https://github.com/Andre-Williams22/Reinforcement-Learning-Agent
 ``` 
-```
+```bash
 # cd into the repo
 cd Reinforecement-Learning-Agent
 ```
-```
+```bash
 # cd into the program locally
 cd rl
 ```
-```
+```bash
 # train the program
 python3 linear_rl_trader.py -m train
 ```
-```
+```bash
 # test the program on dataset
 python3 linear_rl_trader.py -m test
 ```
-```
+```bash
 # to plot the distributions
 python3 plot_rl_rewards.py -m test
 ```
