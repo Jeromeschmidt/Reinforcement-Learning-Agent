@@ -10,12 +10,16 @@ import os
 import pickle
 from sklearn.preprocessing import StandardScaler
 
+from get_data import getData
+
 # Let's use AAPL (Apple), MSI (Motorola), SBUX (Starbucks)
-def get_data():
+def get_data(tickers):
   # returns a T x 3 list of stock prices
-  # each row is a different stock
-  df = pd.read_csv('../data/aapl_msi_sbux.csv')
-  return df.values
+  # each column is a different stock
+  # df = pd.read_csv('../data/aapl_msi_sbux.csv')
+  # return df.values
+  return getData(tickers).values
+
 
 def get_scaler(env):
   # return scikit-learn scaler object to scale the states
@@ -187,7 +191,7 @@ class MultiStockEnv:
     obs[self.n_stock:2*self.n_stock] = self.stock_price
     obs[-1] = self.cash_in_hand
     return obs
-    
+
 
 
   def _get_val(self):
@@ -306,6 +310,7 @@ if __name__ == '__main__':
   initial_investment = 20000
 
 
+
   parser = argparse.ArgumentParser()
   parser.add_argument('-m', '--mode', type=str, required=True,
                       help='either "train" or "test"')
@@ -314,7 +319,9 @@ if __name__ == '__main__':
   maybe_make_dir(models_folder)
   maybe_make_dir(rewards_folder)
 
-  data = get_data()
+  tickers = ["NIO", "PLTR", "AAPL", "AMZN", "FB"]
+
+  data = get_data(tickers)
   n_timesteps, n_stocks = data.shape
 
   n_train = n_timesteps // 2
