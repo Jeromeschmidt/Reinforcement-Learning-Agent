@@ -3,5 +3,6 @@ env
 .DS_Store
 .env
 account.json
+venv
 
 alpaca-api/hist_data/account.json
