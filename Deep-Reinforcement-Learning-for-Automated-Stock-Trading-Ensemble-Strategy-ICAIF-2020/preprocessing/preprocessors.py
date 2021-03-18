@@ -119,11 +119,12 @@ def preprocess_data():
 def calcualte_adjcp(df):
 
     data = df.copy()
-    # data['adjcp'] = data['prccd'] / data['ajexdi']
-    data['adjcp'] = 0.0
-    # data['adjcp'] = random.uniform(0.000000000000,99.999999999999)
-    for index, row in data.iterrows():
-        data.at[index, 'adjcp'] = random.uniform(0.000000000000,99.999999999999)
+    # # data['adjcp'] = data['prccd'] / data['ajexdi']
+    # data['adjcp'] = 0.0
+    # # data['adjcp'] = random.uniform(0.000000000000,99.999999999999)
+    # for index, row in data.iterrows():
+    #     data.at[index, 'adjcp'] = random.uniform(0.000000000000,99.999999999999)
+    data['adjcp'] = data['close']
     return data
 
 
