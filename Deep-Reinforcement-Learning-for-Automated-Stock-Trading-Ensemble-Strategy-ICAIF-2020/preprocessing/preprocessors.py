@@ -11,8 +11,10 @@ def load_dataset(*, file_name: str) -> pd.DataFrame:
     load csv dataset from path
     :return: (df) pandas dataframe
     """
-    #_data = pd.read_csv(f"{config.DATASET_DIR}/{file_name}")
+    # _data = pd.read_csv(f"{config.DATASET_DIR}/{file_name}")
     # _data = pd.read_csv(file_name)
+
+    # print(_data)
     _data = getData(["GOOG", "MSFT", "AAPL", "AMZN", "FB"])
     return _data
 
@@ -99,18 +101,19 @@ def preprocess_data():
 
     df = load_dataset(file_name=config.TRAINING_DATA_FILE)
     # get data after 2009
-    # df = df[df.datadate>=20090000]
+    df = df[df.datadate>=20090000]
     # calcualte adjusted price
     # df_preprocess = calcualte_price(df)
     # add technical indicators using stockstats
-    df = calcualte_adjcp(df)
-    # df_final=add_technical_indicator(df_preprocess)
-    df_final=add_technical_indicator(df)
+    df_preprocess = calcualte_adjcp(df)
+    df_final=add_technical_indicator(df_preprocess)
+    # df_final=add_technical_indicator(df)
     # fill the missing values at the beginning
-    # df_final.fillna(method='bfill',inplace=True)
-    df_final = df.fillna(method='bfill',inplace=True)
+    df_final = df_final.drop(["close"], axis=1)
+    df_final.fillna(method='bfill',inplace=True)
+    # df_final = df.fillna(method='bfill',inplace=True)
     # print(df)
-    return df
+    return df_final
 
 
 def calcualte_adjcp(df):

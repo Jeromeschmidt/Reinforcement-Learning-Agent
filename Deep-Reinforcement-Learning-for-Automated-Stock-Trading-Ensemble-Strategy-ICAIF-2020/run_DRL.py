@@ -29,10 +29,12 @@ def run_model() -> None:
     data = preprocess_data()
     data = data.drop_duplicates()
     # data = calcualte_adjcp(data)
-    print(data)
     data = add_turbulence(data)
     # data.to_csv(preprocessed_path)
+    print(data)
 
+
+    print(type(data))
     # print(data.head())
     # print(data.size)
 
@@ -40,7 +42,7 @@ def run_model() -> None:
     # 2016/01/01 is the date that real trading starts
     # unique_trade_date needs to start from 2015/10/01 for validation purpose
     # unique_trade_date = data[(data.datadate > 20151001)&(data.datadate <= 20200707)].datadate.unique()
-    unique_trade_date = data[(data.datadate > 20170327)&(data.datadate <= 20210316)].datadate.unique()
+    unique_trade_date = data[(data.datadate > 20180327)&(data.datadate <= 20210317)].datadate.unique()
     # print(unique_trade_date)
 
     # rebalance_window is the number of months to retrain the model
