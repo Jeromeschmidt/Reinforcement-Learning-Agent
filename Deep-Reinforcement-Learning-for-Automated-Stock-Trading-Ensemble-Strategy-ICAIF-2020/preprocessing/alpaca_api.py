@@ -9,7 +9,12 @@ import time
 
 endpoint = "https://data.alpaca.markets/v1"
 
-headers = json.loads(open("../account.json", 'r').read())
+# headers = json.loads(open("../account.json", 'r').read())
+
+headers = {
+    "APCA-API-KEY-ID": "PKHOA1VIMFOC6P6YFNS8",
+    "APCA-API-SECRET-KEY": "BIZJBuginzyMC3JpPdBvRqTWVkb1Xol6FjSuaFZN"
+}
 
 
 def hist_data(symbol, dataframe, timeframe="15Min", limit=200, start="", end="", after="", until=""):

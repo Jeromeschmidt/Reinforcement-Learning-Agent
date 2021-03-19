@@ -50,12 +50,23 @@ def run_model() -> None:
     rebalance_window = 63
     validation_window = 63
 
-    # print(data)
-    ## Ensemble Strategy
-    run_ensemble_strategy(df=data,
-                          unique_trade_date= unique_trade_date,
-                          rebalance_window = rebalance_window,
-                          validation_window=validation_window)
+    action = 'trade'
+
+
+    if action == 'train':
+        # print(data)
+        ## Ensemble Strategy Train
+        run_ensemble_strategy(df=data,
+                            unique_trade_date= unique_trade_date,
+                            rebalance_window = rebalance_window,
+                            validation_window=validation_window)
+    else:
+        ### Ensemble for Trading
+        trade(df=data,
+            unique_trade_date=unique_trade_date,
+            rebalance_window =rebalance_window,
+            validation_window=validation_window)
+
 
     #_logger.info(f"saving model version: {_version}")
 

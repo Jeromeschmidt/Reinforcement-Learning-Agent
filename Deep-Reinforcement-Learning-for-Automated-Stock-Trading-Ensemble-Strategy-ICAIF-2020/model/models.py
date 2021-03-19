@@ -43,8 +43,9 @@ def train_ACER(env_train, model_name, timesteps=25000):
     model.learn(total_timesteps=timesteps)
     end = time.time()
 
-    model.save(f"{config.TRAINED_MODEL_DIR}/{model_name}")
-    print('Training time (A2C): ', (end - start) / 60, ' minutes')
+    # model.save(f"{config.TRAINED_MODEL_DIR}/{model_name}")
+    model.save(f"{TRAINED_MODEL_DIR}/{model_name}")
+    print('Training time (ACER): ', (end - start) / 60, ' minutes')
     return model
 
 
@@ -61,7 +62,8 @@ def train_DDPG(env_train, model_name, timesteps=10000):
     model.learn(total_timesteps=timesteps)
     end = time.time()
 
-    model.save(f"{config.TRAINED_MODEL_DIR}/{model_name}")
+    # model.save(f"{config.TRAINED_MODEL_DIR}/{model_name}")
+    model.save(f"{TRAINED_MODEL_DIR}/{model_name}")
     print('Training time (DDPG): ', (end-start)/60,' minutes')
     return model
 
@@ -74,8 +76,8 @@ def train_PPO(env_train, model_name, timesteps=50000):
 
     model.learn(total_timesteps=timesteps)
     end = time.time()
-
-    model.save(f"{config.TRAINED_MODEL_DIR}/{model_name}")
+    # .config.TRAINED_MODEL_DIR
+    model.save(f"{TRAINED_MODEL_DIR}/{model_name}")
     print('Training time (PPO): ', (end - start) / 60, ' minutes')
     return model
 
@@ -188,7 +190,6 @@ def run_ensemble_strategy(df, unique_trade_date, rebalance_window, validation_wi
         historical_turbulence = df.iloc[start_date_index:(end_date_index + 1), :]
         #historical_turbulence = df[(df.datadate<unique_trade_date[i - rebalance_window - validation_window]) & (df.datadate>=(unique_trade_date[i - rebalance_window - validation_window - 63]))]
 
-
         historical_turbulence = historical_turbulence.drop_duplicates(subset=['datadate'])
 
         historical_turbulence_mean = np.mean(historical_turbulence.turbulence.values)
@@ -263,6 +264,25 @@ def run_ensemble_strategy(df, unique_trade_date, rebalance_window, validation_wi
             model_ensemble = model_ddpg
             model_use.append('DDPG')
         ############## Training and Validation ends ##############
+        
+        
+    end = time.time()
+    print("Ensemble Strategy took: ", (end - start) / 60, " minutes")
+
+
+def trade(df, unique_trade_date, rebalance_window, validation_window):
+    '''Function that trades in the market'''
+    start = time.time()
+    for i in range(rebalance_window + validation_window, len(unique_trade_date), rebalance_window):
+        print("============================================")
+        ## initial state is empty
+        if i - rebalance_window - validation_window == 0:
+            # inital state
+            initial = True
+        else:
+            # previous state
+            initial = False
+
 
         ############## Trading starts ##############
         print("======Trading from: ", unique_trade_date[i - rebalance_window], "to ", unique_trade_date[i])
@@ -273,8 +293,8 @@ def run_ensemble_strategy(df, unique_trade_date, rebalance_window, validation_wi
                                              rebalance_window=rebalance_window,
                                              turbulence_threshold=turbulence_threshold,
                                              initial=initial)
+        
+
+        
         # print("============Trading Done============")
         ############## Trading ends ##############
-
-    end = time.time()
-    print("Ensemble Strategy took: ", (end - start) / 60, " minutes")
