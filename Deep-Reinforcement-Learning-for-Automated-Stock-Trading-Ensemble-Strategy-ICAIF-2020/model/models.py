@@ -265,36 +265,20 @@ def run_ensemble_strategy(df, unique_trade_date, rebalance_window, validation_wi
             model_use.append('DDPG')
         ############## Training and Validation ends ##############
         
-        
-    end = time.time()
-    print("Ensemble Strategy took: ", (end - start) / 60, " minutes")
-
-
-def trade(df, unique_trade_date, rebalance_window, validation_window):
-    '''Function that trades in the market'''
-    start = time.time()
-    for i in range(rebalance_window + validation_window, len(unique_trade_date), rebalance_window):
-        print("============================================")
-        ## initial state is empty
-        if i - rebalance_window - validation_window == 0:
-            # inital state
-            initial = True
-        else:
-            # previous state
-            initial = False
-
-
+    
         ############## Trading starts ##############
         print("======Trading from: ", unique_trade_date[i - rebalance_window], "to ", unique_trade_date[i])
         #print("Used Model: ", model_ensemble)
         last_state_ensemble = DRL_prediction(df=df, model=model_ensemble, name="ensemble",
-                                             last_state=last_state_ensemble, iter_num=i,
-                                             unique_trade_date=unique_trade_date,
-                                             rebalance_window=rebalance_window,
-                                             turbulence_threshold=turbulence_threshold,
-                                             initial=initial)
-        
-
-        
+                                                last_state=last_state_ensemble, iter_num=i,
+                                                unique_trade_date=unique_trade_date,
+                                                rebalance_window=rebalance_window,
+                                                turbulence_threshold=turbulence_threshold,
+                                                initial=initial)
+            
         # print("============Trading Done============")
         ############## Trading ends ##############
+        
+    end = time.time()
+    print("Ensemble Strategy took: ", (end - start) / 60, " minutes")
+
