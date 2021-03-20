@@ -5,64 +5,77 @@ import alpaca_trade_api as t
 import logging
 import pytz
 import time
-
-# input : year(date), num of stocks
-# output: list of volatile stocks
-
+import csv
 import yfinance as yf
-# from pandas_datareader import data as pdr
 import pandas as pd
 
-# list all stocks
-url = "ftp://ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt"
-df=pd.read_csv(url, sep="|")
-print(df.head())
-print(df['Symbol'].head())
-print(len(df['Symbol']))
+def get_stock_symbols():
+  sp500 = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+  df = sp500[0]
+  symbols = df['Symbol'].tolist()
+  return symbols
 
-
-def lookup_fn(df, key_row, key_col):
+def df_lookup(df, key_row, key_col):
   try:
     return df.iloc[key_row][key_col]
   except IndexError:
     return 0
 
+def get_movement_list(stocks, period):
+  movement_list = []
+  f = open("stock_changes.csv", "w")
+  stock_writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+  stock_writer.writerow(["stock", "delta_percent", "delta_price"]) # add header to csv
+  for stock in stocks:
+    # get history
+    curr_stock = yf.Ticker(stock)
+    hist = curr_stock.history(period = period) #lookback 1 day
 
-#get_movement_list
-movementlist = []
-for stock in df['Symbol']:
-  # get history
-  thestock = yf.Ticker(stock)
-  hist = thestock.history(period="1d") #lookback 1 day
-  # print(stock)
-  low = float(10000)
-  high = float(0)
-  # print(thestock.info)
-  for day in hist.itertuples(index=True, name='Pandas'):
-    if day.Low < low:
-      low = day.Low
-    if high < day.High:
-      high = day.High
-  
-  deltapercent = 100 * (high - low)/low
-  Open = lookup_fn(hist, 0, "Open")
-  # some error handling: 
-  if len(hist >=5):
-    Close = lookup_fn(hist, 4, "Close")
-  else :
-    Close = Open
-  if(Open == 0):
-    deltaprice = 0
-  else:
-    deltaprice = 100 * (Close - Open) / Open #correct zero division error
-  print(stock+" "+str(deltapercent)+ " "+ str(deltaprice))
-  pair = [stock, deltapercent, deltaprice]
-  movementlist.append(pair)
+    low = float(10000)
+    high = float(0)
+    # print(curr_stock.info)
+    for day in hist.itertuples(index=True, name='Pandas'):
+      if day.Low < low:
+        low = day.Low
+      if high < day.High:
+        high = day.High
+    #for zero division error handling
+    # if low == 0:
+    #   delta_percent = 0
+    # else:
+    delta_percent = 100 * (high - low) / low #check for division by 0
+    Open = df_lookup(hist, 0, "Open")
 
-print('here')
-#get highest movers (moved morethan 100%)
-for entry in movementlist:
-  
-  if entry[1]>float(100):
-    print(entry)  
+    # some error handling: 
+    if len(hist >= 5):
+      Close = df_lookup(hist, 4, "Close")
+    else :
+      Close = Open
 
+    if (Open == 0):
+      delta_price = 0
+    else:
+      delta_price = 100 * (Close - Open) / Open 
+ 
+    # print(stock+" "+str(delta_percent)+ " "+ str(delta_price))
+    pair = [stock, delta_percent, delta_price]
+    movement_list.append(pair)
+    stock_writer.writerow(pair)
+  #close the txt file
+  f.close()
+  return movement_list 
+
+
+def get_highest_movers():
+  #read the stock_changes csv file
+  stocks = pd.read_csv('stock_changes.csv')
+  #sort by delta percent
+  sorted_stocks = stocks.sort_values('delta_percent', ascending=False)
+  # #take the top 20 values
+  most_volatile_stocks = sorted_stocks.head(20)
+  return most_volatile_stocks['stock'].tolist()
+
+if __name__ == "__main__":
+  stocks = get_stock_symbols()
+  get_movement_list(stocks, "1d")
+  print(get_highest_movers())
