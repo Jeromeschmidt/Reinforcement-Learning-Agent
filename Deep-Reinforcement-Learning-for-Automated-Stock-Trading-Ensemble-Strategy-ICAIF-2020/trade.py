@@ -27,3 +27,7 @@ def prediction(df):
     
     action, _states = model.predict(df)
     
+    obs_trade, rewards, dones, info = env_trade.step(action)
+    
+    
+    
