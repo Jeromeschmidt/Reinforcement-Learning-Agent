@@ -50,13 +50,15 @@ def run_model() -> None:
     # end = data["datadate"].max()
     # start = end - 10000
 
-    unique_trade_date = data[(data.datadate > 20200319)&(data.datadate <= 20210318)].datadate.unique()
+    unique_trade_date = data[(data.datadate > 20200631)&(data.datadate <= 20201231)].datadate.unique()
     # print(unique_trade_date)
 
     # rebalance_window is the number of months to retrain the model
     # validation_window is the number of months to validation the model and select for trading
-    rebalance_window = 63
-    validation_window = 63
+    # rebalance_window = 63
+    # validation_window = 63
+    rebalance_window = 30
+    validation_window = 30
 
     # print(data)
     ## Ensemble Strategy

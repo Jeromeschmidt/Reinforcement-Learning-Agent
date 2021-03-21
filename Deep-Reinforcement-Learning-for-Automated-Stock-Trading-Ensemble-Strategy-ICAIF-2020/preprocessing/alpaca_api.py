@@ -20,12 +20,14 @@ def hist_data(symbol, dataframe, timeframe="15Min", limit=200, start="", end="",
 
     params = {
         "symbols": symbol,
-        "start": start,
-        "end": end,
+        # "start": start,
+        # "end": end,
+        "start": "2020-01-01T09:30:00-04:00",
+        "end": "2020-12-31T09:30:00-04:00",
         "limit": 1000,
         "timeframe": "day"
     }
-    
+
     r = requests.get(bar_url, headers=headers, params=params)
 
     json_dump = r.json()

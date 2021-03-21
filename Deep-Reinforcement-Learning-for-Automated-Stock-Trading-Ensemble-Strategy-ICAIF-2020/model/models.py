@@ -167,8 +167,8 @@ def run_ensemble_strategy(df, unique_trade_date, rebalance_window, validation_wi
     # insample_turbulence = df[(df.datadate<20151000) & (df.datadate>=20090000)]
     # end = unique_trade_date.min()
     # start = end - 10000 # df["datadate"].min()
-    insample_turbulence = df[(df.datadate<20200319) & (df.datadate>=20200101)]
-    insample_turbulence = insample_turbulence.drop_duplicates(subset=['datadate'])
+    # insample_turbulence = df[(df.datadate<20200831) & (df.datadate>=20200101)]
+    # insample_turbulence = insample_turbulence.drop_duplicates(subset=['datadate'])
     # insample_turbulence_threshold = np.quantile(insample_turbulence.turbulence.values, .90)
 
     start = time.time()
@@ -187,7 +187,7 @@ def run_ensemble_strategy(df, unique_trade_date, rebalance_window, validation_wi
         end_date_index = df.index[df["datadate"] == unique_trade_date[i - rebalance_window - validation_window]].to_list()[-1]
         start_date_index = end_date_index - validation_window*30 + 1
 
-        historical_turbulence = df.iloc[start_date_index:(end_date_index + 1), :]
+        # historical_turbulence = df.iloc[start_date_index:(end_date_index + 1), :]
         #historical_turbulence = df[(df.datadate<unique_trade_date[i - rebalance_window - validation_window]) & (df.datadate>=(unique_trade_date[i - rebalance_window - validation_window - 63]))]
 
 
@@ -224,7 +224,7 @@ def run_ensemble_strategy(df, unique_trade_date, rebalance_window, validation_wi
         ############## Environment Setup ends ##############
 
         ############## Training and Validation starts ##############
-        print("======Model training from: ", 20190610, "to ",
+        print("======Model training from: ", 20200101, "to ",
               unique_trade_date[i - rebalance_window - validation_window])
         # print("training: ",len(data_split(df, start=20090000, end=test.datadate.unique()[i-rebalance_window]) ))
         # print("==============Model Training===========")
