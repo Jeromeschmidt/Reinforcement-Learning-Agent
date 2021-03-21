@@ -6,7 +6,7 @@ from config import config
 import random
 from preprocessing.alpaca_api import getData
 
-def load_dataset(*, file_name: str) -> pd.DataFrame:
+def load_dataset(tickers) -> pd.DataFrame:
     """
     load csv dataset from path
     :return: (df) pandas dataframe
@@ -15,7 +15,7 @@ def load_dataset(*, file_name: str) -> pd.DataFrame:
     # _data = pd.read_csv(file_name)
 
     # print(_data)
-    _data = getData(["GOOG", "MSFT", "AAPL", "AMZN", "FB"])
+    _data = getData(tickers)
     return _data
 
 def data_split(df,start,end):
@@ -96,10 +96,11 @@ def add_technical_indicator(df):
 
 
 
-def preprocess_data():
+def preprocess_data(tickers):
     """data preprocessing pipeline"""
 
-    df = load_dataset(file_name=config.TRAINING_DATA_FILE)
+    # df = load_dataset(file_name=config.TRAINING_DATA_FILE)
+    df = load_dataset(tickers)
     # get data after 2009
     df = df[df.datadate>=20090000]
     # calcualte adjusted price
