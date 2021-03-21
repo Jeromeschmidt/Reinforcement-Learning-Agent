@@ -91,4 +91,4 @@ def get_highest_movers():
     most_volatile_stocks = sorted_stocks.head(20)
     return most_volatile_stocks['stock'].tolist()
 
-print(get_highest_movers())
+# print(get_highest_movers())

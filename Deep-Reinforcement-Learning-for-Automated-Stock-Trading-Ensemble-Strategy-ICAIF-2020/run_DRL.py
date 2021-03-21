@@ -7,6 +7,7 @@ from stable_baselines.common.vec_env import DummyVecEnv
 # preprocessor
 from preprocessing.preprocessors import *
 from preprocessing.alpaca_api import *
+from preprocessing.GetStocks import *
 # config
 from config.config import *
 # model
@@ -26,15 +27,19 @@ def run_model() -> None:
     #     data = add_turbulence(data)
     #     data.to_csv(preprocessed_path)
 
-    data = preprocess_data()
+
+    # tickers = get_highest_movers()
+    # print(tickers)
+    tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
+
+
+    data = preprocess_data(tickers)
     data = data.drop_duplicates()
     # data = calcualte_adjcp(data)
-    data = add_turbulence(data)
-    # data.to_csv(preprocessed_path)
     print(data)
+    # data = add_turbulence(data)
+    # data.to_csv(preprocessed_path)
 
-
-    print(type(data))
     # print(data.head())
     # print(data.size)
 
@@ -42,7 +47,10 @@ def run_model() -> None:
     # 2016/01/01 is the date that real trading starts
     # unique_trade_date needs to start from 2015/10/01 for validation purpose
     # unique_trade_date = data[(data.datadate > 20151001)&(data.datadate <= 20200707)].datadate.unique()
-    unique_trade_date = data[(data.datadate > 20180327)&(data.datadate <= 20210317)].datadate.unique()
+    # end = data["datadate"].max()
+    # start = end - 10000
+
+    unique_trade_date = data[(data.datadate > 20200319)&(data.datadate <= 20210318)].datadate.unique()
     # print(unique_trade_date)
 
     # rebalance_window is the number of months to retrain the model
@@ -50,23 +58,12 @@ def run_model() -> None:
     rebalance_window = 63
     validation_window = 63
 
-    action = 'trade'
-
-
-    if action == 'train':
-        # print(data)
-        ## Ensemble Strategy Train
-        run_ensemble_strategy(df=data,
-                            unique_trade_date= unique_trade_date,
-                            rebalance_window = rebalance_window,
-                            validation_window=validation_window)
-    else:
-        ### Ensemble for Trading
-        trade(df=data,
-            unique_trade_date=unique_trade_date,
-            rebalance_window =rebalance_window,
-            validation_window=validation_window)
-
+    # print(data)
+    ## Ensemble Strategy
+    run_ensemble_strategy(df=data,
+                          unique_trade_date= unique_trade_date,
+                          rebalance_window = rebalance_window,
+                          validation_window=validation_window)
 
     #_logger.info(f"saving model version: {_version}")
 

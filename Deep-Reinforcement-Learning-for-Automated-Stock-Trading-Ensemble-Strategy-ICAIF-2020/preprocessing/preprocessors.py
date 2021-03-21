@@ -146,7 +146,7 @@ def calcualte_turbulence(df):
     """calculate turbulence index based on dow 30"""
     # can add other market assets
 
-    df_price_pivot=df.pivot(index='datadate', columns='tic', values='adjcp')
+    df_price_pivot=df.reset_index().pivot(index='datadate', columns='tic', values='adjcp')
     unique_date = df.datadate.unique()
     # start after a year
     start = 252
