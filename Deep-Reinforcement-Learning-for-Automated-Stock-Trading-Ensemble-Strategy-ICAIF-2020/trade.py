@@ -25,9 +25,17 @@ def loads_model():
 def prediction(df):
     ''' predicts on current state '''
     
+    model = loads_model()
+    
     action, _states = model.predict(df)
     
     obs_trade, rewards, dones, info = env_trade.step(action)
     
     
+
+if __name__ == '__main__':
     
+    
+    pass
+    
+       
