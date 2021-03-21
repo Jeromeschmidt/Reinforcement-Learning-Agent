@@ -13,7 +13,7 @@ endpoint = "https://data.alpaca.markets/v1"
 headers = json.loads(open("account.json", 'r').read())
 
 
-def hist_data(symbols, timeframe="15Min", limit=200, start="", end="", after="", until=""):
+def hist_data(symbols, timeframe="day", limit=1, start="", end="", after="", until=""):
     '''Returns the historical bar data for a group of stocks '''
     df_data = {}
     # Get Requests for Bar Data
@@ -54,8 +54,9 @@ def hist_data(symbols, timeframe="15Min", limit=200, start="", end="", after="",
 
 #data_dump = hist_data("FB,AMZN,INTC,MSFT,AAPL,GOOG,CSCO,CMCSA,ADBE,NVDA,NFLX,PYPL,AMGN,AVGO,TXN,CHTR,QCOM,GILD,FISV,BKNG,INTU,ADP,CME,TMUS,MU", timeframe="5Min", limit=200) #"NIO,AAPL,PLTR"
 
-data_dump = hist_data('AAPL,MSFT')
+data_dump = hist_data('MSFT')
 max_pos = 1000
 
 
-print(int(max_pos/hist_data('AAPL')['AAPL']["close"].iloc[-1]))
+# print(int(max_pos/hist_data('AAPL')['AAPL']["close"].iloc[-1]))
+print(data_dump)
