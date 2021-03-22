@@ -63,22 +63,11 @@ def makeTrades(df, model, tickers):
     #     self._buy_stock(index, actions[index])
     pass
 
-
-def prediction(df):
-    ''' predicts on current state '''
     
-    model = loads_model()
-    
-    action, _states = model.predict(df)
-    
-    obs_trade, rewards, dones, info = env_trade.step(action)
-
-       
-
 
 if __name__ == "__main__":
-    # tickers = get_highest_movers()
-    tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
+    tickers = get_highest_movers()
+    #tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
 
     # model = load_model(tickers)
 

@@ -6,14 +6,15 @@ import logging
 import pytz
 import time
 import csv
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_contexts
 # input : year(date), num of stocks
 # output: list of volatile stocks
 
 import yfinance as yf
 # from pandas_datareader import data as pdr
 import pandas as pd
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+
 
 def get_stock_symbols():
   sp500 = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
