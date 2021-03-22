@@ -22,3 +22,4 @@ wheel>=0.33.6,<0.34.0
 
 requests
 alpaca_trade_api
+yfinance
