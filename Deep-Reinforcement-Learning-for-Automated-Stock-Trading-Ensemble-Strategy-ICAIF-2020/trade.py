@@ -80,7 +80,8 @@ if __name__ == "__main__":
     #     isOpen = self.alpaca.get_clock().is_open
 
     # Get previous day stock information from alpaca as df
-    data = preprocess_data(tickers, limit=1)
+    data = preprocess_data(tickers, limit=2)
+    data = data[(data.datadate >= data.datadate.max())]
     print(data)
 
 

@@ -25,7 +25,6 @@ def hist_data(symbol, dataframe, timeframe="day", limit=1000, start="", end="", 
         "limit": limit,
         "timeframe": "day"
     }
-    print(params)
 
     r = requests.get(bar_url, headers=headers, params=params)
 

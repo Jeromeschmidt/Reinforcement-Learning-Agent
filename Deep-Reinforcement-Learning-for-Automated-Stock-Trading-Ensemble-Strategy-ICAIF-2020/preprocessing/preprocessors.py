@@ -66,8 +66,6 @@ def add_technical_indicator(df):
     rsi = pd.DataFrame()
     cci = pd.DataFrame()
     dx = pd.DataFrame()
-    print("********")
-    print(unique_ticker)
 
     #temp = stock[stock.tic == unique_ticker[0]]['macd']
     for i in range(len(unique_ticker)):
@@ -109,7 +107,6 @@ def preprocess_data(tickers, start=None, end=None, limit=1000):
     # df_preprocess = calcualte_price(df)
     # add technical indicators using stockstats
     df_preprocess = calcualte_adjcp(df)
-    print(df_preprocess)
     df_final=add_technical_indicator(df_preprocess)
     # df_final=add_technical_indicator(df)
     # fill the missing values at the beginning
