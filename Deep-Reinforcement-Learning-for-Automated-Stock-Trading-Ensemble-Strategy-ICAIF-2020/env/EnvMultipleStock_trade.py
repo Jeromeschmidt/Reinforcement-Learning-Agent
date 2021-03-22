@@ -8,7 +8,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pickle
 
-
 # shares normalization factor
 # 100 shares per trade
 HMAX_NORMALIZE = 100
@@ -149,7 +148,11 @@ class StockEnvTrade(gym.Env):
 
             # print('total asset: {}'.format(self.state[0]+ sum(np.array(self.state[1:29])*np.array(self.state[29:]))))
             #with open('obs.pkl', 'wb') as f:
+<<<<<<< HEAD
             #    .dump(self.picklestate, f)
+=======
+            #    pickle.dump(self.state, f)
+>>>>>>> 15c5232b2280c0507b4a5a629a682fc34743a22f
 
             return self.state, self.reward, self.terminal,{}
 
@@ -173,6 +176,7 @@ class StockEnvTrade(gym.Env):
             for index in sell_index:
                 # print('take sell action'.format(actions[index]))
                 self._sell_stock(index, actions[index])
+<<<<<<< HEAD
                 api.submit_order(ticker, actions[index], "sell", "day")
                 
                 
@@ -180,6 +184,12 @@ class StockEnvTrade(gym.Env):
                 # print('take buy action: {}'.format(actions[index]))
                 self._buy_stock(index, actions[index])
                 api.submit_order(ticker, actions[index], "buy", "market", "ioc")
+=======
+
+            for index in buy_index:
+                # print('take buy action: {}'.format(actions[index]))
+                self._buy_stock(index, actions[index])
+>>>>>>> 15c5232b2280c0507b4a5a629a682fc34743a22f
 
             self.day += 1
             self.data = self.df.loc[self.day,:]
