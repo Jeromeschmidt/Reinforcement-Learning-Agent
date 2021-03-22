@@ -18,6 +18,15 @@ import os
 from run_DRL import run_model
 import alpaca_trade_api as alpaca
 
+headers = json.loads(open("account.json", 'r').read())
+# api = alpaca.REST(headers)
+api = alpaca.REST(
+    headers['APCA-API-KEY-ID'],
+    headers['APCA-API-SECRET-KEY'],
+    'https://paper-api.alpaca.markets', api_version='v2'
+)
+
+HMAX_NORMALIZE = 100
 
 
 def load_model(tickers):
@@ -32,55 +41,43 @@ def load_model(tickers):
     return model
 
 
-def makeTrades(df, model, tickers):
+def makeTrades(df):#, model):
     '''predicts on current state using pretrained model'''
+    mappings = dict()
+    i = 0
+
+    for index, row in df.iterrows():
+        mappings[i] = row['tic']
+        i += 1
+
+    print(mappings)
 
 
-    # action, _states = model.predict(df)
-    #
-    # actions = actions * HMAX_NORMALIZE
-    # #actions = (actions.astype(int))
-    # # if self.turbulence>=self.turbulence_threshold:
-    # #     actions=np.array([-HMAX_NORMALIZE]*STOCK_DIM)
-    #
-    # begin_total_asset = self.state[0]+ \
-    # sum(np.array(self.state[1:(STOCK_DIM+1)])*np.array(self.state[(STOCK_DIM+1):(STOCK_DIM*2+1)]))
-    # #print("begin_total_asset:{}".format(begin_total_asset))
-    #
-    # argsort_actions = np.argsort(actions)
-    #
-    # sell_index = argsort_actions[:np.where(actions < 0)[0].shape[0]]
-    # buy_index = argsort_actions[::-1][:np.where(actions > 0)[0].shape[0]]
-    #
-    # for index in sell_index:
-    #     # print('take sell action.format(actions[index]))
-    #     self._sell_stock(index, actions[index])
-    #     [0,1,-1]
-    #     self stock at in df at index index for the quanitiy of actions[index]
-    #
-    # for index in buy_index:
-    #     # print('take buy action: {}'.format(actions[index]))
-    #     self._buy_stock(index, actions[index])
-    pass
-
-
-def prediction(df):
-    ''' predicts on current state '''
-    
-    model = loads_model()
-    
     action, _states = model.predict(df)
-    
-    obs_trade, rewards, dones, info = env_trade.step(action)
 
-       
+    actions = actions * HMAX_NORMALIZE
+
+    argsort_actions = np.argsort(actions)
+
+    sell_index = argsort_actions[:np.where(actions < 0)[0].shape[0]]
+    buy_index = argsort_actions[::-1][:np.where(actions > 0)[0].shape[0]]
+
+    for index in sell_index:
+        print('take sell action {}'.format(actions[index]))
+        api.submit_order(symbol=mappings[index],qty=actions[index],side='sell',type='market',time_in_force='gtc')
+
+    for index in buy_index:
+        print('take buy action: {}'.format(actions[index]))
+        api.submit_order(symbol=mappings[index],qty=actions[index],side='buy',type='market',time_in_force='gtc')
+
 
 
 if __name__ == "__main__":
-    # tickers = get_highest_movers()
-    tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
+    tickers = get_highest_movers()
+    # tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
+    print(tickers)
 
-    # model = load_model(tickers)
+    model = load_model(tickers)
 
     # isOpen = self.alpaca.get_clock().is_open
     # while(not isOpen):
@@ -95,7 +92,8 @@ if __name__ == "__main__":
     # Get previous day stock information from alpaca as df
     data = preprocess_data(tickers, limit=2)
     data = data[(data.datadate >= data.datadate.max())]
+    data = data.reset_index()
+    data = data.drop(["index"], axis=1)
     print(data)
 
-
-    # makeTrades(df, model, tickers)
+    makeTrades(data, model)

@@ -14,7 +14,7 @@ HMAX_NORMALIZE = 100
 # initial amount of money we have in our account
 INITIAL_ACCOUNT_BALANCE=1000000
 # total number of stocks in our portfolio
-STOCK_DIM = 5
+STOCK_DIM = 20
 # transaction fee: 1/1000 reasonable percentage
 TRANSACTION_FEE_PERCENT = 0.001
 # TRANSACTION_FEE_PERCENT = 0.000
@@ -40,7 +40,7 @@ class StockEnvTrade(gym.Env):
         # Shape = 181: [Current Balance]+[prices 1-30]+[owned shares 1-30]
         # +[macd 1-30]+ [rsi 1-30] + [cci 1-30] + [adx 1-30]
         # self.observation_space = spaces.Box(low=0, high=np.inf, shape = (181,))
-        self.observation_space = spaces.Box(low=0, high=np.inf, shape = (31,))
+        self.observation_space = spaces.Box(low=0, high=np.inf, shape = (121,))
         # load data from a pandas dataframe
         self.data = self.df.loc[self.day,:]
         self.terminal = False
@@ -148,11 +148,11 @@ class StockEnvTrade(gym.Env):
 
             # print('total asset: {}'.format(self.state[0]+ sum(np.array(self.state[1:29])*np.array(self.state[29:]))))
             #with open('obs.pkl', 'wb') as f:
-<<<<<<< HEAD
-            #    .dump(self.picklestate, f)
-=======
-            #    pickle.dump(self.state, f)
->>>>>>> 15c5232b2280c0507b4a5a629a682fc34743a22f
+# <<<<<<< HEAD
+#             #    .dump(self.picklestate, f)
+# =======
+#             #    pickle.dump(self.state, f)
+# >>>>>>> 15c5232b2280c0507b4a5a629a682fc34743a22f
 
             return self.state, self.reward, self.terminal,{}
 
@@ -176,20 +176,20 @@ class StockEnvTrade(gym.Env):
             for index in sell_index:
                 # print('take sell action'.format(actions[index]))
                 self._sell_stock(index, actions[index])
-<<<<<<< HEAD
-                api.submit_order(ticker, actions[index], "sell", "day")
-                
-                
-            for index in buy_index:
-                # print('take buy action: {}'.format(actions[index]))
-                self._buy_stock(index, actions[index])
-                api.submit_order(ticker, actions[index], "buy", "market", "ioc")
-=======
+# <<<<<<< HEAD
+#                 api.submit_order(ticker, actions[index], "sell", "day")
+
+
+            # for index in buy_index:
+            #     # print('take buy action: {}'.format(actions[index]))
+            #     self._buy_stock(index, actions[index])
+            #     api.submit_order(ticker, actions[index], "buy", "market", "ioc")
+# =======
 
             for index in buy_index:
                 # print('take buy action: {}'.format(actions[index]))
                 self._buy_stock(index, actions[index])
->>>>>>> 15c5232b2280c0507b4a5a629a682fc34743a22f
+# >>>>>>> 15c5232b2280c0507b4a5a629a682fc34743a22f
 
             self.day += 1
             self.data = self.df.loc[self.day,:]
