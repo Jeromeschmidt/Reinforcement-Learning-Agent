@@ -212,6 +212,7 @@ def run_ensemble_strategy(df, unique_trade_date, rebalance_window, validation_wi
         ############## Environment Setup starts ##############
         ## training env
         train = data_split(df, start=20200101, end=unique_trade_date[i - rebalance_window - validation_window])
+        print(train)
         env_train = DummyVecEnv([lambda: StockEnvTrain(train)])
 
         ## validation env
@@ -282,3 +283,4 @@ def run_ensemble_strategy(df, unique_trade_date, rebalance_window, validation_wi
 
     end = time.time()
     print("Ensemble Strategy took: ", (end - start) / 60, " minutes")
+    return model_ensemble

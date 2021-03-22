@@ -6,7 +6,7 @@ from config import config
 import random
 from preprocessing.alpaca_api import getData
 
-def load_dataset(tickers) -> pd.DataFrame:
+def load_dataset(tickers, start=None, end=None, limit=1000) -> pd.DataFrame:
     """
     load csv dataset from path
     :return: (df) pandas dataframe
@@ -15,7 +15,7 @@ def load_dataset(tickers) -> pd.DataFrame:
     # _data = pd.read_csv(file_name)
 
     # print(_data)
-    _data = getData(tickers)
+    _data = getData(tickers, limit=limit, start=start, end=end)
     return _data
 
 def data_split(df,start,end):
@@ -66,6 +66,8 @@ def add_technical_indicator(df):
     rsi = pd.DataFrame()
     cci = pd.DataFrame()
     dx = pd.DataFrame()
+    print("********")
+    print(unique_ticker)
 
     #temp = stock[stock.tic == unique_ticker[0]]['macd']
     for i in range(len(unique_ticker)):
@@ -96,17 +98,18 @@ def add_technical_indicator(df):
 
 
 
-def preprocess_data(tickers):
+def preprocess_data(tickers, start=None, end=None, limit=1000):
     """data preprocessing pipeline"""
 
     # df = load_dataset(file_name=config.TRAINING_DATA_FILE)
-    df = load_dataset(tickers)
+    df = load_dataset(tickers, limit=limit, start=start, end=end)
     # get data after 2009
-    df = df[df.datadate>=20090000]
+    # df = df[df.datadate>=20090000]
     # calcualte adjusted price
     # df_preprocess = calcualte_price(df)
     # add technical indicators using stockstats
     df_preprocess = calcualte_adjcp(df)
+    print(df_preprocess)
     df_final=add_technical_indicator(df_preprocess)
     # df_final=add_technical_indicator(df)
     # fill the missing values at the beginning

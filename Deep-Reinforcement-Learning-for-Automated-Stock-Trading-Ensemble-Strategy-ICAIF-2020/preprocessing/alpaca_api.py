@@ -12,7 +12,7 @@ endpoint = "https://data.alpaca.markets/v1"
 headers = json.loads(open("account.json", 'r').read())
 
 
-def hist_data(symbol, dataframe, timeframe="15Min", limit=200, start="", end="", after="", until=""):
+def hist_data(symbol, dataframe, timeframe="day", limit=1000, start="", end="", after="", until=""):
     '''Returns the historical bar data for a group of stocks '''
     df_data = {}
     # Get Requests for Bar Data
@@ -20,13 +20,12 @@ def hist_data(symbol, dataframe, timeframe="15Min", limit=200, start="", end="",
 
     params = {
         "symbols": symbol,
-        # "start": start,
-        # "end": end,
-        "start": "2020-01-01T09:30:00-04:00",
-        "end": "2020-12-31T09:30:00-04:00",
-        "limit": 1000,
+        "start": start,
+        "end": end,
+        "limit": limit,
         "timeframe": "day"
     }
+    print(params)
 
     r = requests.get(bar_url, headers=headers, params=params)
 
@@ -44,7 +43,7 @@ def hist_data(symbol, dataframe, timeframe="15Min", limit=200, start="", end="",
     return dataframe
 
 
-def getData(tickers):
+def getData(tickers, start, end, limit):
     dataframes = dict()
     for symbol in tickers:
         dataframes[symbol] = pd.DataFrame()#columns = [symbol])
@@ -60,7 +59,7 @@ def getData(tickers):
     # print("****************************************************")
     for company in tickers:
         # print("printing data for {} at {}".format(company, time.time()))
-        dataframes[company] = hist_data(company, dataframes[company])
+        dataframes[company] = hist_data(company, dataframes[company], limit=limit, start=start, end=end)
 
     final_prices = dataframes[tickers[0]]
 

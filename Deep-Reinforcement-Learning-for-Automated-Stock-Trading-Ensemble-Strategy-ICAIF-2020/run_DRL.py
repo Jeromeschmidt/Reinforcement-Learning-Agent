@@ -14,7 +14,7 @@ from config.config import *
 from model.models import *
 import os
 
-def run_model() -> None:
+def run_model(tickers, start, end) -> None:
     """Train the model."""
 
     # # read and preprocess data
@@ -30,10 +30,9 @@ def run_model() -> None:
 
     # tickers = get_highest_movers()
     # print(tickers)
-    tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
 
 
-    data = preprocess_data(tickers)
+    data = preprocess_data(tickers, start, end)
     data = data.drop_duplicates()
     # data = calcualte_adjcp(data)
     print(data)
@@ -70,4 +69,6 @@ def run_model() -> None:
     #_logger.info(f"saving model version: {_version}")
 
 if __name__ == "__main__":
-    run_model()
+    tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
+
+    run_model(tickers,start="2020-01-01T09:30:00-04:00", end="2020-12-31T09:30:00-04:00")
