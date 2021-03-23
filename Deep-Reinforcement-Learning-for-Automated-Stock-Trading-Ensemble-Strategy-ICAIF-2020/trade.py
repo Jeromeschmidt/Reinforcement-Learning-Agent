@@ -139,7 +139,7 @@ def buy_stock(index, action, mappings):
         # trades+=1
         info(cprice, 1)
     else:
-        return 'insufficient funds'
+        return 
 
 def sell_stock(index, action):
     # perform sell action based on the sign of the action
@@ -270,6 +270,7 @@ def step(actions, i, mappings, state, reward):
                         print('num shares owned: ', position.qty)
                         api.submit_order(symbol=mappings[index],qty=int(position.qty),side='sell',type='market',time_in_force='day')
                         sell_stock(index, actions[index])
+                        
 
 
             # for index in buy_index:
