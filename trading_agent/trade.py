@@ -34,7 +34,7 @@ STOCK_DIM = 20
 
 def load_model(tickers):
     '''Load in the pretrained model from the trained models folder '''
-    # model = run_model(tickers)
+    # model = run_model(tickers,start="2020-01-01T09:30:00-04:00", end="2020-12-31T09:30:00-04:00")
     model = A2C.load("trained_models/2021-03-22 18:25:09.528982/A2C_30k_dow_120.zip")
 
     return model
