@@ -110,16 +110,19 @@ def buy_stock(index, action, mappings):
     #               df.adx.values.tolist()
     # perform buy action based on the sign of the action
     # if self.turbulence< self.turbulence_threshold:
-    available_amount = float(account.buying_power)#state[0] // state[index+1]
+    available_amount = float(account.equity) - float(account.last_equity)#float(account.buying_power)#state[0] // state[index+1]
     # print('available_amount:{}'.format(available_amount))
+    
     
     current_price = api.get_barset(mappings[index], 'day', limit=1)
     price = current_price[mappings[index]]
     cprice = price[-1].c
+    cost = action*cprice
     
-    if available_amount >= action*cprice:
-        
+    if available_amount > cost:
+        print('available amount', available_amount)
         print('Submitted order: ', round(action))
+        
         api.submit_order(symbol=mappings[index],qty=round(int(action)),side='buy',type='market',time_in_force='day')
 
         # #update balance
@@ -135,6 +138,8 @@ def buy_stock(index, action, mappings):
         #                     TRANSACTION_FEE_PERCENT
         # trades+=1
         info(cprice, 1)
+    else:
+        return 'insufficient funds'
 
 def sell_stock(index, action):
     # perform sell action based on the sign of the action
@@ -148,7 +153,9 @@ def sell_stock(index, action):
         state[index+STOCK_DIM+1] -= min(abs(action), state[index+STOCK_DIM+1])
         cost += state[index+1]*min(abs(action),state[index+STOCK_DIM+1]) * \
             TRANSACTION_FEE_PERCENT
-        trades+=1
+        # trades+=1
+        
+        info(cprice, 1)
 
 def makeTrades(df, model):
     '''predicts on current state using pretrained model'''
@@ -273,7 +280,7 @@ def step(actions, i, mappings, state, reward):
             for index in buy_index:
                 # print('take buy action: {}'.format(actions[index]))                
                 # make alpaca api request
-                print('buying power: ', account.buying_power)
+                print('buying power: ', float(account.buying_power))
                 print('num to buy: ', int(actions[index]))
                 buy_stock(index, actions[index], mappings)
 
