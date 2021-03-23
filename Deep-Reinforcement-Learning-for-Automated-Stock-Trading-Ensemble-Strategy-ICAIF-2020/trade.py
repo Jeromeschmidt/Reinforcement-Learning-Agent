@@ -13,7 +13,7 @@ from config.config import *
 # model
 from model.models import *
 import os
-
+from stable_baselines import A2C
 
 from run_DRL import run_model
 import alpaca_trade_api as alpaca
@@ -27,21 +27,25 @@ api = alpaca.REST(
 )
 
 HMAX_NORMALIZE = 100
+STOCK_DIM = 20
 
 
 def load_model(tickers):
     '''Load in the pretrained model from the trained models folder '''
-    model = None
-    try:
-        model = run_model(tickers)
-    except:
-        # get model from trained model files to find most recent trained model
-        pass
+    # model = run_model(tickers)
+
+    # try:
+    #     model = run_model(tickers)
+    # except:
+    #     # get model from trained model files to find most recent trained model
+    #     pass
+
+    model = A2C.load("trained_models/2021-03-22 18:25:09.528982/A2C_30k_dow_120.zip")
 
     return model
 
 
-def makeTrades(df):#, model):
+def makeTrades(df, model):
     '''predicts on current state using pretrained model'''
     mappings = dict()
     i = 0
@@ -52,10 +56,19 @@ def makeTrades(df):#, model):
 
     print(mappings)
 
+    data = [100000] + \
+                  df.adjcp.values.tolist() + \
+                  [0]*STOCK_DIM + \
+                  df.macd.values.tolist() + \
+                  df.rsi.values.tolist() + \
+                  df.cci.values.tolist() + \
+                  df.adx.values.tolist()
 
-    action, _states = model.predict(df)
+
+    actions, _states = model.predict(data)
 
     actions = actions * HMAX_NORMALIZE
+    print(actions)
 
     argsort_actions = np.argsort(actions)
 
@@ -63,18 +76,19 @@ def makeTrades(df):#, model):
     buy_index = argsort_actions[::-1][:np.where(actions > 0)[0].shape[0]]
 
     for index in sell_index:
-        print('take sell action {}'.format(actions[index]))
-        api.submit_order(symbol=mappings[index],qty=actions[index],side='sell',type='market',time_in_force='gtc')
+        print(type(int(actions[index])))
+        print('take sell action {}'.format(mappings[index]))
+        api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='gtc')
 
     for index in buy_index:
         print('take buy action: {}'.format(actions[index]))
-        api.submit_order(symbol=mappings[index],qty=actions[index],side='buy',type='market',time_in_force='gtc')
+        api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='gtc')
 
 
 
 if __name__ == "__main__":
-    tickers = get_highest_movers()
-    # tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
+    # tickers = get_highest_movers()
+    tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
     print(tickers)
 
     model = load_model(tickers)
@@ -94,6 +108,7 @@ if __name__ == "__main__":
     data = data[(data.datadate >= data.datadate.max())]
     data = data.reset_index()
     data = data.drop(["index"], axis=1)
+    data = data.fillna(method='ffill')
     print(data)
 
     makeTrades(data, model)
