@@ -281,7 +281,7 @@ def step(actions, i, mappings, state, reward):
             for index in buy_index:
                 # print('take buy action: {}'.format(actions[index]))                
                 # make alpaca api request
-                print('buying power: ', float(account.buying_power))
+                print('buying power: ', float(account.equity) - float(account.last_equity))
                 print('num to buy: ', int(actions[index]))
                 buy_stock(index, actions[index], mappings)
 
