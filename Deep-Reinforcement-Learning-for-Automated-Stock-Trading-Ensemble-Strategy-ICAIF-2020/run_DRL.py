@@ -14,7 +14,7 @@ from config.config import *
 from model.models import *
 import os
 
-def run_model(tickers, start, end) -> None:
+def run_model(tickers, start="2020-01-01T09:30:00-04:00", end="2020-12-31T09:30:00-04:00") -> None:
     """Train the model."""
 
     # # read and preprocess data
@@ -61,12 +61,13 @@ def run_model(tickers, start, end) -> None:
 
     # print(data)
     ## Ensemble Strategy
-    run_ensemble_strategy(df=data,
+    model = run_ensemble_strategy(df=data,
                           unique_trade_date= unique_trade_date,
                           rebalance_window = rebalance_window,
                           validation_window=validation_window)
 
     #_logger.info(f"saving model version: {_version}")
+    return model
 
 if __name__ == "__main__":
     tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
