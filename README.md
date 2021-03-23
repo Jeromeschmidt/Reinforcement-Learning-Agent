@@ -52,6 +52,12 @@ By contributing, you agree that your contributions will be licensed under its MI
 
 In short, when you submit code changes, your submissions are understood to be under the same [MIT License](http://choosealicense.com/licenses/mit/) that covers the project. Feel free to contact the maintainers if that's a concern.
 
+## Credit and Acknowledgment
+
+https://towardsdatascience.com/finrl-for-quantitative-finance-tutorial-for-multiple-stock-trading-7b00763b7530
+https://towardsdatascience.com/find-the-highest-moving-hidden-stocks-of-the-day-with-python-aab0d7bfe5ff
+
+
 ## Contributors
 
 Anyone is welcome to contribute!
