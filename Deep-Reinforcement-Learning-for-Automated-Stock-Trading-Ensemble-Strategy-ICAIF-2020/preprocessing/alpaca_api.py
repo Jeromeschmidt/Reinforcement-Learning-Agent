@@ -6,11 +6,17 @@ import logging
 import pandas as pd
 import pytz
 import time
+import alpaca_trade_api as alpaca
 
 endpoint = "https://data.alpaca.markets/v1"
 
 headers = json.loads(open("account.json", 'r').read())
 
+api = alpaca.REST(
+    headers['APCA-API-KEY-ID'],
+    headers['APCA-API-SECRET-KEY'],
+    'https://paper-api.alpaca.markets', api_version='v2'
+)
 
 def hist_data(symbol, dataframe, timeframe="day", limit=1000, start="", end="", after="", until=""):
     '''Returns the historical bar data for a group of stocks '''

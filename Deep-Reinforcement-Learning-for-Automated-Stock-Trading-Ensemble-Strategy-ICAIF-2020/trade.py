@@ -16,15 +16,7 @@ import os
 from stable_baselines import A2C
 
 from run_DRL import run_model
-import alpaca_trade_api as alpaca
 
-headers = json.loads(open("account.json", 'r').read())
-# api = alpaca.REST(headers)
-api = alpaca.REST(
-    headers['APCA-API-KEY-ID'],
-    headers['APCA-API-SECRET-KEY'],
-    'https://paper-api.alpaca.markets', api_version='v2'
-)
 
 account = api.get_account()
 
@@ -114,4 +106,5 @@ if __name__ == "__main__":
     data = data.fillna(method='ffill')
     print(data)
 
+    #make trades on current stock data 
     makeTrades(data, model)
