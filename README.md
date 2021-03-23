@@ -3,6 +3,7 @@
 <br>
 <br>
 A tool to automate trading and investing.
+
 Built by: Jerome Schmidt, Andre Williams, and Liya Sileshi
 </p>
 <p align="center">
