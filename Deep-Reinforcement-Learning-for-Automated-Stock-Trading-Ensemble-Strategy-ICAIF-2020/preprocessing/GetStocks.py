@@ -7,7 +7,7 @@ import pytz
 import time
 import csv
 import ssl
-ssl._create_default_https_context = ssl._create_unverified_contexts
+#ssl._create_default_https_context = ssl._create_unverified_contexts
 # input : year(date), num of stocks
 # output: list of volatile stocks
 
