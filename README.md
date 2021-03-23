@@ -4,7 +4,7 @@
 <br>
 A tool to automate trading and investing.
 
-Built by: Jerome Schmidt, Andre Williams, and Liya Sileshi
+Built by: Jerome Schmidt, Andre Williams, and Liya Sileshi Tilahun
 
 [Presentation](https://drive.google.com/file/d/1iKW_uxNKN2yIG1RkcCShZDt60yDb1gEf/view?usp=sharing)
 </p>
@@ -17,6 +17,8 @@ Built by: Jerome Schmidt, Andre Williams, and Liya Sileshi
 
 ## 🚀 Getting Started
 
+## Prerequisites
+* python3.7
 
 ## 💻 Local Development
 
@@ -67,5 +69,11 @@ Anyone is welcome to contribute!
 <table>
   <tr>
     <td align="center"><a href="https://github.com/Andre-Williams22"><br /><sub><b>Andre Williams</b></sub></a><br /><a href="https://github.com/Andre-Williams22/msconsole/commits?author=Andre-Williams22" title="Code">💻</a></td>
-
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/liyaSileshi"><br /><sub><b>Liya Tilahun</b></sub></a><br /><a title="Code">👩🏽‍💻</a></td>
+  </tr>
+    <tr>
+    <td align="center"><a href="#"><br /><sub><b>Jerome Schmidt</b></sub></a><br /><a title="Code">💻</a></td>
+  </tr>
+</table>
