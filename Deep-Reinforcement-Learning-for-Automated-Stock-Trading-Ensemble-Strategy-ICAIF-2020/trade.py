@@ -19,7 +19,6 @@ from run_DRL import run_model
 # custom env 
 from env.EnvMultipleStock_trade import StockEnvTrade
 
-
 account = api.get_account()
 
 INITIAL_ACCOUNT_BALANCE=100000
@@ -77,7 +76,7 @@ def render(mode='human',close=False):
     '''returns state'''
     return state
 
-def buy_stock(index, action):
+def buy_stock(index, action, mappings):
     # state = [account.buying_power] + \
     #               df.adjcp.values.tolist() + \
     #               [0]*STOCK_DIM + \
@@ -87,18 +86,27 @@ def buy_stock(index, action):
     #               df.adx.values.tolist()
     # perform buy action based on the sign of the action
     # if self.turbulence< self.turbulence_threshold:
-    available_amount = account.buying_power#state[0] // state[index+1]
+    available_amount = int(account.buying_power)#state[0] // state[index+1]
     # print('available_amount:{}'.format(available_amount))
+    
+    current_price = api.get_barset(mappings[index], 'day', limit=1)
+    price = current_price[mappings[index]]
+    cprice = price[-1].c
+    
+    if available_amount >= action*cprice:
+        
+        print('Submitted order: ', action)
+        # api.submit_order(symbol=mappings[index],qty=int(account.buying_power)/int(action),side='buy',type='market',time_in_force='day')
 
-    #update balance
-    state[0] -= account.equity #state[index+1]*min(available_amount, action)* \
-                        #(1+ TRANSACTION_FEE_PERCENT)
+        # #update balance
+        # state[0] -= account.equity #state[index+1]*min(available_amount, action)* \
+        #                     #(1+ TRANSACTION_FEE_PERCENT)
 
-    state[index+STOCK_DIM+1] += min(available_amount, action)
+        # state[index+STOCK_DIM+1] += min(available_amount, action)
 
-    cost+= state[index+1]*min(available_amount, action)* \
-                        TRANSACTION_FEE_PERCENT
-    trades+=1
+        # cost+= state[index+1]*min(available_amount, action)* \
+        #                     TRANSACTION_FEE_PERCENT
+        # trades+=1
 
 def sell_stock(index, action):
     # perform sell action based on the sign of the action
@@ -139,21 +147,21 @@ def makeTrades(df, model):
         actions = actions * HMAX_NORMALIZE
         print(actions)
 
-    argsort_actions = np.argsort(actions)
+    # argsort_actions = np.argsort(actions)
 
-    sell_index = argsort_actions[:np.where(actions < 0)[0].shape[0]]
-    buy_index = argsort_actions[::-1][:np.where(actions > 0)[0].shape[0]]
+    # sell_index = argsort_actions[:np.where(actions < 0)[0].shape[0]]
+    # buy_index = argsort_actions[::-1][:np.where(actions > 0)[0].shape[0]]
 
-    portfolio = api.list_positions()
+    # portfolio = api.list_positions()
 
-    for index in sell_index:
-        print('take sell action {}'.format(mappings[index]))
-        api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
+    # for index in sell_index:
+    #     print('take sell action {}'.format(mappings[index]))
+    #     api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
 
-    for index in buy_index:
-        print('take buy action: {}'.format(actions[index]))
-        api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
-        #buy_stock(index, mappings[index], data)
+    # for index in buy_index:
+    #     print('take buy action: {}'.format(actions[index]))
+    #     api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
+    #     #buy_stock(index, mappings[index], data)
 
 def step(actions, i, mappings, state, reward):
         # print(self.day)
@@ -203,7 +211,7 @@ def step(actions, i, mappings, state, reward):
             # if self.turbulence>=self.turbulence_threshold:
             #     actions=np.array([-HMAX_NORMALIZE]*STOCK_DIM)
 
-            begin_total_asset = account.equity
+            begin_total_asset = int(account.equity)
             # state[0]+ \
             # sum(np.array(state[1:(STOCK_DIM+1)])*np.array(state[(STOCK_DIM+1):(STOCK_DIM*2+1)]))
             #print("begin_total_asset:{}".format(begin_total_asset))
@@ -218,8 +226,15 @@ def step(actions, i, mappings, state, reward):
                 # print('take sell action'.format(actions[index]))
                 # make alpaca request
                 
-                api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
-                sell_stock(index, actions[index])
+                positions = api.list_positions()
+                
+                for position in positions:
+                    if position.symbol == mappings[index] and abs(int(actions[index])) - position.qty >= 0:
+                        print('quantity amount: ', abs(int(actions[index])))
+                        print(position.symbol)
+                        print('num shares owned: ', position.qty)
+                        api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
+                        sell_stock(index, actions[index])
 
 
             # for index in buy_index:
@@ -230,11 +245,12 @@ def step(actions, i, mappings, state, reward):
             for index in buy_index:
                 # print('take buy action: {}'.format(actions[index]))                
                 # make alpaca api request
-                # positions = api.list_positions()
-                api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
-                buy_stock(index, actions[index])
+                print('buying power: ', account.buying_power)
+                print('num to buy: ', int(actions[index]))
+                #api.submit_order(symbol=mappings[index],qty=int(account.buying_power)/int(actions[index]),side='buy',type='market',time_in_force='day')
+                buy_stock(index, actions[index], mappings)
 
-            day += 1
+            # day += 1
             # data = df.loc[day,:]
             # self.turbulence = self.data['turbulence'].values[0]
             #print(self.turbulence)
@@ -248,8 +264,9 @@ def step(actions, i, mappings, state, reward):
                     data.cci.values.tolist() + \
                     data.adx.values.tolist()
 
-            end_total_asset = state[0]+ \
-            sum(np.array(state[1:(STOCK_DIM+1)])*np.array(state[(STOCK_DIM+1):(STOCK_DIM*2+1)]))
+            end_total_asset = int(account.equity) - int(account.last_equity)
+            # state[0]+ \
+            # sum(np.array(state[1:(STOCK_DIM+1)])*np.array(state[(STOCK_DIM+1):(STOCK_DIM*2+1)]))
             asset_memory.append(end_total_asset)
             #print("end_total_asset:{}".format(end_total_asset))
 
@@ -342,4 +359,5 @@ if __name__ == "__main__":
     #         data.adx.values.tolist()
 
     #make trades on current stock data 
+    account = api.get_account()
     makeTrades(data, model)
