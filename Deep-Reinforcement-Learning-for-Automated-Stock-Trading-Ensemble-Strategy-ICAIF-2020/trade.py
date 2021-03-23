@@ -26,6 +26,8 @@ api = alpaca.REST(
     'https://paper-api.alpaca.markets', api_version='v2'
 )
 
+account = api.get_account()
+
 HMAX_NORMALIZE = 100
 STOCK_DIM = 20
 
@@ -56,7 +58,7 @@ def makeTrades(df, model):
 
     print(mappings)
 
-    data = [100000] + \
+    data = [account.buying_power] + \
                   df.adjcp.values.tolist() + \
                   [0]*STOCK_DIM + \
                   df.macd.values.tolist() + \
@@ -75,14 +77,15 @@ def makeTrades(df, model):
     sell_index = argsort_actions[:np.where(actions < 0)[0].shape[0]]
     buy_index = argsort_actions[::-1][:np.where(actions > 0)[0].shape[0]]
 
+    portfolio = api.list_positions()
+
     for index in sell_index:
-        print(type(int(actions[index])))
         print('take sell action {}'.format(mappings[index]))
-        api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='gtc')
+        api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
 
     for index in buy_index:
         print('take buy action: {}'.format(actions[index]))
-        api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='gtc')
+        api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
 
 
 
