@@ -35,13 +35,6 @@ STOCK_DIM = 20
 def load_model(tickers):
     '''Load in the pretrained model from the trained models folder '''
     # model = run_model(tickers)
-
-    # try:
-    #     model = run_model(tickers)
-    # except:
-    #     # get model from trained model files to find most recent trained model
-    #     pass
-
     model = A2C.load("trained_models/2021-03-22 18:25:09.528982/A2C_30k_dow_120.zip")
 
     return model
@@ -71,12 +64,15 @@ def makeTrades(df, model):
 
     actions = actions * HMAX_NORMALIZE
     # print(actions)
-    temp_score = sum(actions)
-    # actions = actions * temp_score * HMAX_NORMALIZE
-    # print(actions)
-    # # qty = account.buying_power * (abs(int(actions[index]))/temp_score)
-    # print((actions/temp_score))
-    # qty = account.buying_power*(actions/temp_score)
+    # temp_score = sum(actions)
+    # temp_score = [actions[i]/temp_score for i in range(len(actions))]#actions/temp_score
+    # print(temp_score)
+    # # actions = actions * temp_score * HMAX_NORMALIZE
+    # # print(actions)
+    # # # qty = account.buying_power * (abs(int(actions[index]))/temp_score)
+    # # print((actions/temp_score))
+    # print(type(temp_score))
+    # qty = float(account.buying_power*temp_score[0])
     # print(qty)
 
     argsort_actions = np.argsort(actions)
@@ -90,12 +86,14 @@ def makeTrades(df, model):
         print('take sell action {}'.format(mappings[index]))
         # api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
         # api.submit_order(symbol=mappings[index],notional=20000,side='sell',type='market',time_in_force='day')
-        pass
+        # api.submit_order(symbol=mappings[index],qty=abs(int(account.buying_power*temp_score[index])),side='sell',type='market',time_in_force='day')
+        # pass
 
     for index in buy_index:
         print('take buy action: {}'.format(mappings[index]))
         # api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
         # api.submit_order(symbol=mappings[index],notional=20000,side='buy',type='market',time_in_force='day')
+        # api.submit_order(symbol=mappings[index],qty=abs(int(account.buying_power*temp_score[index])),side='sell',type='market',time_in_force='day')
 
 
 
@@ -125,6 +123,8 @@ if __name__ == "__main__":
     print(data)
 
     makeTrades(data, model)
+
+    1,000,043.38
 
     #3,803,810.34 Buying Power
 
