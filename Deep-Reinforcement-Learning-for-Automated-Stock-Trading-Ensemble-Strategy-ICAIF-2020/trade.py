@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import time
+import gym
 from stable_baselines.common.vec_env import DummyVecEnv
 
 # preprocessor
@@ -14,15 +15,38 @@ from config.config import *
 from model.models import *
 import os
 from stable_baselines import A2C
-
 from run_DRL import run_model
+# custom env 
+from env.EnvMultipleStock_trade import StockEnvTrade
 
 
 account = api.get_account()
 
+INITIAL_ACCOUNT_BALANCE=100000
 HMAX_NORMALIZE = 100
 STOCK_DIM = 20
+TRANSACTION_FEE_PERCENT = 0.001
+asset_memory = [INITIAL_ACCOUNT_BALANCE]
+cost = 0
+trades = 0
+reward = 0
+rewards_memory = []
+day = 0
+REWARD_SCALING = 1e-4
 
+tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
+data = preprocess_data(tickers, limit=2)
+data = data[(data.datadate >= data.datadate.max())]
+data = data.reset_index()
+data = data.drop(["index"], axis=1)
+data = data.fillna(method='ffill')
+state = [account.buying_power] + \
+        data.adjcp.values.tolist() + \
+        [0]*STOCK_DIM + \
+        data.macd.values.tolist() + \
+        data.rsi.values.tolist() + \
+        data.cci.values.tolist() + \
+        data.adx.values.tolist()
 
 def load_model(tickers):
     '''Load in the pretrained model from the trained models folder '''
@@ -33,36 +57,87 @@ def load_model(tickers):
     # except:
     #     # get model from trained model files to find most recent trained model
     #     pass
-
+    #loads pretrained model
     model = A2C.load("trained_models/2021-03-22 18:25:09.528982/A2C_30k_dow_120.zip")
 
     return model
 
-
-def makeTrades(df, model):
-    '''predicts on current state using pretrained model'''
+def map_stocks_index(df):
+    '''maps df to index to correct ticker '''
     mappings = dict()
     i = 0
 
     for index, row in df.iterrows():
         mappings[i] = row['tic']
         i += 1
+    
+    return mappings
+
+def render(mode='human',close=False):
+    '''returns state'''
+    return state
+
+def buy_stock(index, action):
+    # state = [account.buying_power] + \
+    #               df.adjcp.values.tolist() + \
+    #               [0]*STOCK_DIM + \
+    #               df.macd.values.tolist() + \
+    #               df.rsi.values.tolist() + \
+    #               df.cci.values.tolist() + \
+    #               df.adx.values.tolist()
+    # perform buy action based on the sign of the action
+    # if self.turbulence< self.turbulence_threshold:
+    available_amount = account.buying_power#state[0] // state[index+1]
+    # print('available_amount:{}'.format(available_amount))
+
+    #update balance
+    state[0] -= account.equity #state[index+1]*min(available_amount, action)* \
+                        #(1+ TRANSACTION_FEE_PERCENT)
+
+    state[index+STOCK_DIM+1] += min(available_amount, action)
+
+    cost+= state[index+1]*min(available_amount, action)* \
+                        TRANSACTION_FEE_PERCENT
+    trades+=1
+
+def sell_stock(index, action):
+    # perform sell action based on the sign of the action
+    # if self.turbulence<self.turbulence_threshold:
+    if state[index+STOCK_DIM+1] > 0:
+        #update balance
+        state[0] += account.equity
+        # state[index+1]*min(abs(action),state[index+STOCK_DIM+1]) * \
+        #     (1- TRANSACTION_FEE_PERCENT)
+
+        state[index+STOCK_DIM+1] -= min(abs(action), state[index+STOCK_DIM+1])
+        cost += state[index+1]*min(abs(action),state[index+STOCK_DIM+1]) * \
+            TRANSACTION_FEE_PERCENT
+        trades+=1
+
+def makeTrades(df, model):
+    '''predicts on current state using pretrained model'''
+    
+    # maps data
+    mappings = map_stocks_index(df)
 
     print(mappings)
+    
+    # resets env
+    obs_trade = reset(df)
+    # print("*********************")
+    # print(obs_trade)
+    # print("*********************")
 
-    data = [account.buying_power] + \
-                  df.adjcp.values.tolist() + \
-                  [0]*STOCK_DIM + \
-                  df.macd.values.tolist() + \
-                  df.rsi.values.tolist() + \
-                  df.cci.values.tolist() + \
-                  df.adx.values.tolist()
+    for i in range(len(mappings)):
+        
+        actions, _states = model.predict(obs_trade)
+        obs_trade, rewards, dones, info = step(actions, i, mappings, state, reward)
+        
+        if i == (len(mappings) - 2):
+            last_state = render()
 
-
-    actions, _states = model.predict(data)
-
-    actions = actions * HMAX_NORMALIZE
-    print(actions)
+        actions = actions * HMAX_NORMALIZE
+        print(actions)
 
     argsort_actions = np.argsort(actions)
 
@@ -78,8 +153,160 @@ def makeTrades(df, model):
     for index in buy_index:
         print('take buy action: {}'.format(actions[index]))
         api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
+        #buy_stock(index, mappings[index], data)
+
+def step(actions, i, mappings, state, reward):
+        # print(self.day)
+        terminal = i >= len(mappings)
+        # print(actions)
+
+        if terminal:
+            # plt.plot(self.asset_memory,'r')
+            # plt.savefig('results/account_value_trade_{}_{}.png'.format(self.model_name, self.iteration))
+            # plt.close()
+            
+            df_total_value = pd.DataFrame(asset_memory)
+            # df_total_value.to_csv('results/account_value_trade_{}_{}.csv'.format(self.model_name, self.iteration))
+            end_total_asset = state[0]+ \
+            sum(np.array(state[1:(STOCK_DIM+1)])*np.array(state[(STOCK_DIM+1):(STOCK_DIM*2+1)]))
+            print("previous_total_asset:{}".format(asset_memory[0]))
+
+            print("end_total_asset:{}".format(end_total_asset))
+            print("total_reward:{}".format(state[0]+sum(np.array(state[1:(STOCK_DIM+1)])*np.array(state[(STOCK_DIM+1):(STOCK_DIM*2+1)]))- asset_memory[0] ))
+            print("total_cost: ", cost)
+            print("total trades: ", trades)
+
+            df_total_value.columns = ['account_value']
+            df_total_value['daily_return']=df_total_value.pct_change(1)
+            print("*********************")
+            print(df_total_value['daily_return'])
+            print(df_total_value['daily_return'].mean())
+            print(df_total_value['daily_return'].std())
+            sharpe = (4**0.5)*df_total_value['daily_return'].mean() / df_total_value['daily_return'].std()
+            print("Sharpe: ",sharpe)
+
+            df_rewards = pd.DataFrame(rewards_memory)
+            #df_rewards.to_csv('results/account_rewards_trade_{}_{}.csv'.format(self.model_name, self.iteration))
+
+            # print('total asset: {}'.format(self.state[0]+ sum(np.array(self.state[1:29])*np.array(self.state[29:]))))
+            #with open('obs.pkl', 'wb') as f:
+#             #    .dump(self.picklestate, f)
+#             #    pickle.dump(self.state, f)
+
+            return state, reward, terminal,{}
+
+        else:
+            # print(np.array(self.state[1:29]))
+
+            actions = actions * HMAX_NORMALIZE
+            #actions = (actions.astype(int))
+            # if self.turbulence>=self.turbulence_threshold:
+            #     actions=np.array([-HMAX_NORMALIZE]*STOCK_DIM)
+
+            begin_total_asset = account.equity
+            # state[0]+ \
+            # sum(np.array(state[1:(STOCK_DIM+1)])*np.array(state[(STOCK_DIM+1):(STOCK_DIM*2+1)]))
+            #print("begin_total_asset:{}".format(begin_total_asset))
+
+            argsort_actions = np.argsort(actions)
+
+            sell_index = argsort_actions[:np.where(actions < 0)[0].shape[0]]
+            buy_index = argsort_actions[::-1][:np.where(actions > 0)[0].shape[0]]
+
+            print("sell index: ", sell_index)
+            for index in sell_index:
+                # print('take sell action'.format(actions[index]))
+                # make alpaca request
+                
+                api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
+                sell_stock(index, actions[index])
 
 
+            # for index in buy_index:
+            #     # print('take buy action: {}'.format(actions[index]))
+            #     self._buy_stock(index, actions[index])
+            #     api.submit_order(ticker, actions[index], "buy", "market", "ioc")
+
+            for index in buy_index:
+                # print('take buy action: {}'.format(actions[index]))                
+                # make alpaca api request
+                # positions = api.list_positions()
+                api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
+                buy_stock(index, actions[index])
+
+            day += 1
+            # data = df.loc[day,:]
+            # self.turbulence = self.data['turbulence'].values[0]
+            #print(self.turbulence)
+            #load next state
+            # print("stock_shares:{}".format(self.state[29:]))
+            state =  [state[0]] + \
+                    data.adjcp.values.tolist() + \
+                    list(state[(STOCK_DIM+1):(STOCK_DIM*2+1)]) + \
+                    data.macd.values.tolist() + \
+                    data.rsi.values.tolist() + \
+                    data.cci.values.tolist() + \
+                    data.adx.values.tolist()
+
+            end_total_asset = state[0]+ \
+            sum(np.array(state[1:(STOCK_DIM+1)])*np.array(state[(STOCK_DIM+1):(STOCK_DIM*2+1)]))
+            asset_memory.append(end_total_asset)
+            #print("end_total_asset:{}".format(end_total_asset))
+
+            reward = end_total_asset - begin_total_asset
+            # print("step_reward:{}".format(self.reward))
+            rewards_memory.append(reward)
+
+            reward = reward*REWARD_SCALING
+
+
+        return state, reward, terminal, {}    
+        
+def reset(df, initial=True, previous_state=[]):
+        if initial:
+            asset_memory = [INITIAL_ACCOUNT_BALANCE]
+            day = 0
+            data = df.loc[day,:]
+            turbulence = 0
+            cost = 0
+            trades = 0
+            terminal = False
+            #self.iteration=self.iteration
+            rewards_memory = []
+            #initiate state
+            state = [account.buying_power] + \
+                  df.adjcp.values.tolist() + \
+                  [0]*STOCK_DIM + \
+                  df.macd.values.tolist() + \
+                  df.rsi.values.tolist() + \
+                  df.cci.values.tolist() + \
+                  df.adx.values.tolist()
+        else:
+            previous_total_asset = previous_state[0]+ \
+            sum(np.array(previous_state[1:(STOCK_DIM+1)])*np.array(previous_state[(STOCK_DIM+1):(STOCK_DIM*2+1)]))
+            asset_memory = [previous_total_asset]
+            #self.asset_memory = [self.previous_state[0]]
+            day = 0
+            data = df.loc[day,:]
+            turbulence = 0
+            cost = 0
+            trades = 0
+            terminal = False
+            #self.iteration=iteration
+            rewards_memory = []
+            #initiate state
+            #self.previous_state[(STOCK_DIM+1):(STOCK_DIM*2+1)]
+            #[0]*STOCK_DIM + \
+
+            state = [account.buying_power] + \
+                  df.adjcp.values.tolist() + \
+                  [0]*STOCK_DIM + \
+                  df.macd.values.tolist() + \
+                  df.rsi.values.tolist() + \
+                  df.cci.values.tolist() + \
+                  df.adx.values.tolist()
+
+        return state
 
 if __name__ == "__main__":
     # tickers = get_highest_movers()
@@ -99,12 +326,20 @@ if __name__ == "__main__":
     #     isOpen = self.alpaca.get_clock().is_open
 
     # Get previous day stock information from alpaca as df
-    data = preprocess_data(tickers, limit=2)
-    data = data[(data.datadate >= data.datadate.max())]
-    data = data.reset_index()
-    data = data.drop(["index"], axis=1)
-    data = data.fillna(method='ffill')
-    print(data)
+    # data = preprocess_data(tickers, limit=2)
+    # data = data[(data.datadate >= data.datadate.max())]
+    # data = data.reset_index()
+    # data = data.drop(["index"], axis=1)
+    # data = data.fillna(method='ffill')
+    # print(data)
+
+    # state = [account.buying_power] + \
+    #         data.adjcp.values.tolist() + \
+    #         [0]*STOCK_DIM + \
+    #         data.macd.values.tolist() + \
+    #         data.rsi.values.tolist() + \
+    #         data.cci.values.tolist() + \
+    #         data.adx.values.tolist()
 
     #make trades on current stock data 
     makeTrades(data, model)

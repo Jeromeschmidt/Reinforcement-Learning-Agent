@@ -6,13 +6,15 @@ import logging
 import pandas as pd
 import pytz
 import time
-import alpaca_trade_api as alpaca
+# import alpaca_trade_api as alpaca
 
 endpoint = "https://data.alpaca.markets/v1"
 
 headers = json.loads(open("account.json", 'r').read())
 
-api = alpaca.REST(
+
+
+api = t.REST(
     headers['APCA-API-KEY-ID'],
     headers['APCA-API-SECRET-KEY'],
     'https://paper-api.alpaca.markets', api_version='v2'
@@ -35,9 +37,12 @@ def hist_data(symbol, dataframe, timeframe="day", limit=1000, start="", end="", 
     r = requests.get(bar_url, headers=headers, params=params)
 
     json_dump = r.json()
+    # print('json dump: ', json_dump)
+    
     # loop through stock data
     for symbol in json_dump:
         # convert json into pandas dataframe
+        # print('symbol: ',symbol)
         temp = pd.DataFrame(json_dump[symbol])
         temp.rename({"t":"datadate", "o": "open", 'h':'high', 'l':'low', "c":"close", 'v':'volume'}, axis=1, inplace=True)
 
