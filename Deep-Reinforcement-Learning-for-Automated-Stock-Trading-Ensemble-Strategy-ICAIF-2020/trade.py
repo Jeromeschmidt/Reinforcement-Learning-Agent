@@ -82,16 +82,19 @@ def makeTrades(df, model):
     for index in sell_index:
         print('take sell action {}'.format(mappings[index]))
         api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
+        # api.submit_order(symbol=mappings[index],notional=20000,side='sell',type='market',time_in_force='day')
+        pass
 
     for index in buy_index:
-        print('take buy action: {}'.format(actions[index]))
+        print('take buy action: {}'.format(mappings[index]))
         api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
+        # api.submit_order(symbol=mappings[index],notional=20000,side='buy',type='market',time_in_force='day')
 
 
 
 if __name__ == "__main__":
     # tickers = get_highest_movers()
-    tickers = ['AMCR', 'CCL', 'ETSY', 'OXY', 'NCLH', 'FLS', 'SIVB', 'V', 'FANG', 'DG', 'MCHP', 'ENPH', 'MRO', 'BBY', 'CB', 'APA', 'DISCK', 'XRX', 'NKE', 'DISCA']
+    tickers = ['DISCA', 'ENPH', 'PENN', 'VIAC', 'HFC', 'WAT', 'NVR', 'UAL', 'DISCK', 'CF', 'BWA', 'APA', 'MRO', 'FANG', 'TFX', 'OXY', 'ROST', 'CCL', 'ALK', 'LUMN']
     print(tickers)
 
     model = load_model(tickers)
@@ -115,3 +118,5 @@ if __name__ == "__main__":
     print(data)
 
     makeTrades(data, model)
+
+    #3,803,810.34 Buying Power
