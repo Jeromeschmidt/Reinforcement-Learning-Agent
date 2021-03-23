@@ -31,6 +31,19 @@ git clone https://github.com/Andre-Williams22/Reinforcement-Learning-Agent
 cd Reinforecement-Learning-Agent
 ```
 ```bash
+# create a virtual environment 
+python3.7 -m venv venv
+```
+```bash
+# Activate virtual environment 
+source venv/bin/activate
+```
+```bash
+# Install the requirements
+pip3 install -r requirements.txt
+```
+
+```bash
 # cd into the program locally
 cd trading_agent
 ```
