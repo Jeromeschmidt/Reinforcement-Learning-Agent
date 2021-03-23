@@ -70,7 +70,14 @@ def makeTrades(df, model):
     actions, _states = model.predict(data)
 
     actions = actions * HMAX_NORMALIZE
-    print(actions)
+    # print(actions)
+    temp_score = sum(actions)
+    # actions = actions * temp_score * HMAX_NORMALIZE
+    # print(actions)
+    # # qty = account.buying_power * (abs(int(actions[index]))/temp_score)
+    # print((actions/temp_score))
+    # qty = account.buying_power*(actions/temp_score)
+    # print(qty)
 
     argsort_actions = np.argsort(actions)
 
@@ -81,13 +88,13 @@ def makeTrades(df, model):
 
     for index in sell_index:
         print('take sell action {}'.format(mappings[index]))
-        api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
+        # api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
         # api.submit_order(symbol=mappings[index],notional=20000,side='sell',type='market',time_in_force='day')
         pass
 
     for index in buy_index:
         print('take buy action: {}'.format(mappings[index]))
-        api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
+        # api.submit_order(symbol=mappings[index],qty=int(actions[index]),side='buy',type='market',time_in_force='day')
         # api.submit_order(symbol=mappings[index],notional=20000,side='buy',type='market',time_in_force='day')
 
 
@@ -120,3 +127,5 @@ if __name__ == "__main__":
     makeTrades(data, model)
 
     #3,803,810.34 Buying Power
+
+    #3,803,810.34
