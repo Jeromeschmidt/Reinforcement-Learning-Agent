@@ -2,7 +2,9 @@
 <h1>Alpaca Reinforcement Learning Agent </h1>
 <br>
 <br>
-A tool to automate trading and investing. 
+A tool to automate trading and investing.
+
+Built by: Jerome Schmidt, Andre Williams, and Liya Sileshi
 </p>
 <p align="center">
   <a href="#" target="_blank">
@@ -19,31 +21,27 @@ A tool to automate trading and investing.
 ```bash
 # clone the repo
 git clone https://github.com/Andre-Williams22/Reinforcement-Learning-Agent
-``` 
+```
 ```bash
 # cd into the repo
 cd Reinforecement-Learning-Agent
 ```
 ```bash
 # cd into the program locally
-cd rl
+cd trading_agent
 ```
 ```bash
-# train the program
-python3 linear_rl_trader.py -m train
+# run the program
+python3 trade.py
 ```
 ```bash
-# test the program on dataset
-python3 linear_rl_trader.py -m test
-```
-```bash
-# to plot the distributions
-python3 plot_rl_rewards.py -m test
+# Only train the model
+python3 run_DRL.py
 ```
 
-## Project Goals 
-1. Build a Reinforcement Learning Algorithm 
-2. Connect algorithm with real-time data 
+## Project Goals
+1. Build a Reinforcement Learning Algorithm
+2. Connect algorithm with real-time data
 3. Setup algorithm with a brokerage to take real positions in the market
 4. Connect algorithm to a scheduler
 
