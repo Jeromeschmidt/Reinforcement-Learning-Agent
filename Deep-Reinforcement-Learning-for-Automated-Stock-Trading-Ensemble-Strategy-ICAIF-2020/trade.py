@@ -119,8 +119,8 @@ def buy_stock(index, action, mappings):
     
     if available_amount >= action*cprice:
         
-        print('Submitted order: ', action)
-        api.submit_order(symbol=mappings[index],qty=int(action),side='buy',type='market',time_in_force='day')
+        print('Submitted order: ', round(action))
+        api.submit_order(symbol=mappings[index],qty=round(int(action)),side='buy',type='market',time_in_force='day')
 
         # #update balance
         state[0] = int(state[0])
@@ -257,11 +257,11 @@ def step(actions, i, mappings, state, reward):
                 positions = api.list_positions()
                 
                 for position in positions:
-                    if position.symbol == mappings[index] and abs(int(actions[index])) - int(position.qty) >= 0:
+                    if position.symbol == mappings[index] and abs(int(actions[index])) >= int(position.qty) and int(position.qty) > 0:
                         print('quantity amount: ', abs(int(actions[index])))
                         print(position.symbol)
                         print('num shares owned: ', position.qty)
-                        api.submit_order(symbol=mappings[index],qty=abs(int(actions[index])),side='sell',type='market',time_in_force='day')
+                        api.submit_order(symbol=mappings[index],qty=int(position.qty),side='sell',type='market',time_in_force='day')
                         sell_stock(index, actions[index])
 
 
