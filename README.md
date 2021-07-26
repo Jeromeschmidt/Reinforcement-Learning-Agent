@@ -6,7 +6,7 @@ A tool to automate trading and investing.
 
 Built by: Jerome Schmidt, Andre Williams, and Liya Sileshi Tilahun
 
-[Presentation](https://drive.google.com/file/d/1iKW_uxNKN2yIG1RkcCShZDt60yDb1gEf/view?usp=sharing)
+[Presentation](https://drive.google.com/file/d/1shmIndR0eh4k_FCdpq-Tv9V-uB7GgNz7/view?usp=sharing)
 </p>
 <p align="center">
   <a href="#" target="_blank">
